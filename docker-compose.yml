@@ -11,5 +11,18 @@ services:
     volumes:
       - timescale:/var/lib/postgresql/data
 
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    ports:
+      - 1883:1883
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./config/mosquitto/mqtt_passwd:/mosquitto/config/mqtt_passwd:ro
+      - mosquitto:/mosquitto/data
+    restart: unless-stopped
+
 volumes:
   timescale:
+  mosquitto:

@@ -1,11 +1,18 @@
 ﻿global using FastEndpoints;
 
+using KayordKit.Extensions.Api;
 using Kayord.IOT.Data;
-using Kayord.IOT.Services;
 using Microsoft.EntityFrameworkCore;
+using KayordKit.Extensions.Host;
+using KayordKit.Extensions.Health;
+using Kayord.IOT.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddFastEndpoints();
+builder.Host.AddLoggingConfiguration(builder.Configuration);
+builder.Services.ConfigureApi();
+
+builder.Services.AddHealthChecks()
+            .AddProcessAllocatedMemoryHealthCheck(150);
 builder.Services.AddHostedService<Mqtt>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -17,7 +24,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 var app = builder.Build();
-app.UseFastEndpoints();
+app.UseApi();
+app.UseHealth();
 app.Run();
 
 

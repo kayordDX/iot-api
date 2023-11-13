@@ -1,18 +1,23 @@
 namespace Kayord.POS.Features.Test;
 
-public class Endpoint : Endpoint<Request, Response>
+public class Endpoint : Endpoint<object, object>
 {
+    private readonly ILogger<Endpoint> _logger;
+
+    public Endpoint(ILogger<Endpoint> logger)
+    {
+        _logger = logger;
+    }
+
     public override void Configure()
     {
-        Get("/test");
+        Post("/test");
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
+    public override async Task HandleAsync(object req, CancellationToken ct)
     {
-        await SendAsync(new Response
-        {
-            FirstName = "Steff Bosch"
-        });
+        _logger.LogInformation("Test Response {$Data}", req);
+        await SendAsync(req);
     }
 }

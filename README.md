@@ -19,11 +19,11 @@ docker compose up -d
 ## Secrets
 
 ```bash
-dotnet user-secrets init
-dotnet user-secrets set "MQTT:User" "secret"
-dotnet user-secrets set "MQTT:Password" "secret"
-dotnet user-secrets set "MQTT:Server" "secret"
-dotnet user-secrets list
+dotnet user-secrets init --project src/Kayord.IOT/ 
+dotnet user-secrets set "MQTT:User" "secret" --project src/Kayord.IOT/
+dotnet user-secrets set "MQTT:Password" "secret" --project src/Kayord.IOT/
+dotnet user-secrets set "MQTT:Server" "secret" --project src/Kayord.IOT/
+dotnet user-secrets list --project src/Kayord.IOT/
 ```
 
 ## Schema
@@ -45,3 +45,22 @@ Event -> TimeScaleTable
 EntityId
 Time
 Value
+
+---
+===
+Sensor
+Topic
+Name
+
+===
+SensorState
+Entity
+State
+LastUpdated
+
+===
+SensorHistory
+Topic
+Time
+State
+---

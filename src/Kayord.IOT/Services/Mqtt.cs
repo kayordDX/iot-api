@@ -1,3 +1,4 @@
+using Humanizer;
 using MQTTnet;
 using MQTTnet.Client;
 
@@ -43,7 +44,7 @@ public class Mqtt : BackgroundService
                         .WithTopicFilter(
                             f =>
                             {
-                                f.WithTopic("#");
+                                f.WithTopic("+/sensor/#");
                             })
                         .Build();
 
@@ -51,6 +52,8 @@ public class Mqtt : BackgroundService
 
                     mqttClient.ApplicationMessageReceivedAsync += e =>
                     {
+                        Console.WriteLine(e.ApplicationMessage.Topic);
+                        // e.ApplicationMessage.PayloadSegment
                         string result = e.ApplicationMessage.ConvertPayloadToString();
                         Console.WriteLine(result);
                         return Task.CompletedTask;
