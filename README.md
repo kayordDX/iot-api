@@ -59,7 +59,7 @@ State
 LastUpdated
 
 ===
-SensorHistory
+SensorReading
 Topic
 Time
 State

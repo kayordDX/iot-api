@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using KayordKit.Extensions.Host;
 using KayordKit.Extensions.Health;
 using Kayord.IOT.Services;
+using Kayord.IOT.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.AddLoggingConfiguration(builder.Configuration);
@@ -23,9 +24,26 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     // options.EnableSensitiveDataLogging();
 });
 
+string _allowedOrigins = "AllowedOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: _allowedOrigins,
+    builder =>
+    {
+        builder.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 app.UseApi();
 app.UseHealth();
+app.UseCors(_allowedOrigins);
+app.MapHub<ChatHub>("/chatHub");
 app.Run();
 
 

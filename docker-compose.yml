@@ -10,6 +10,7 @@ services:
       POSTGRES_PASSWORD: bbHRro5Ju2L9cw
     volumes:
       - timescale:/var/lib/postgresql/data
+    restart: unless-stopped
 
   mosquitto:
     container_name: mosquitto

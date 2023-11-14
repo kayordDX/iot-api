@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Kayord.IOT.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231112123300_Initial")]
-    partial class Initial
+    [Migration("20231114193027_AutoInc")]
+    partial class AutoInc
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,21 +25,47 @@ namespace Kayord.IOT.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Kayord.IOT.Entities.Entity", b =>
+            modelBuilder.Entity("Kayord.IOT.Entities.Sensor", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("LastUpdated")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("State")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Topic")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<DateTimeOffset>("Time")
+                    b.HasKey("Id");
+
+                    b.ToTable("Sensor");
+                });
+
+            modelBuilder.Entity("Kayord.IOT.Entities.SensorReading", b =>
+                {
+                    b.Property<int>("SensorId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Time")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal?>("Value")
-                        .IsRequired()
+                    b.Property<decimal?>("State")
                         .HasColumnType("numeric");
 
-                    b.ToTable("Entity");
+                    b.HasKey("SensorId", "Time");
+
+                    b.ToTable("SensorReading");
                 });
 #pragma warning restore 612, 618
         }

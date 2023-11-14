@@ -1,0 +1,22 @@
+meta {
+  name: Edit Sensor
+  type: http
+  seq: 3
+}
+
+put {
+  url: http://localhost:5117/sensor
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "Id": 1,
+    "Topic": "esphome-web-09f530/sensor/wifi_signal_sensor/state"
+  }
+}

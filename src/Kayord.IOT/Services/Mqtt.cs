@@ -1,4 +1,6 @@
-using Humanizer;
+using Kayord.IOT.Data;
+using Kayord.IOT.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using MQTTnet;
 using MQTTnet.Client;
 
@@ -7,14 +9,23 @@ namespace Kayord.IOT.Services;
 public class Mqtt : BackgroundService
 {
     private readonly IConfiguration _configuration;
+    private readonly ILogger<Mqtt> _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly IHubContext<ChatHub> _hub;
 
-    public Mqtt(IConfiguration configuration)
+    public Mqtt(IConfiguration configuration, ILogger<Mqtt> logger, IServiceScopeFactory serviceScopeFactory, IHubContext<ChatHub> hub)
     {
         _configuration = configuration;
+        _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
+        _hub = hub;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        using var scope = _serviceScopeFactory.CreateScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
         var factory = new MqttFactory();
         using var mqttClient = factory.CreateMqttClient();
 
@@ -37,9 +48,7 @@ public class Mqtt : BackgroundService
                 if (!await mqttClient.TryPingAsync())
                 {
                     await mqttClient.ConnectAsync(options, CancellationToken.None);
-                    // Subscribe to topics when session is clean etc.
-                    Console.WriteLine("The MQTT client is connected.");
-
+                    _logger.LogInformation("The MQTT client is connected.");
                     var mqttSubscribeOptions = factory.CreateSubscribeOptionsBuilder()
                         .WithTopicFilter(
                             f =>
@@ -50,20 +59,21 @@ public class Mqtt : BackgroundService
 
                     await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
 
-                    mqttClient.ApplicationMessageReceivedAsync += e =>
+                    mqttClient.ApplicationMessageReceivedAsync += async e =>
                     {
-                        Console.WriteLine(e.ApplicationMessage.Topic);
+                        await _hub.Clients.All.SendAsync("ReceiveMessage", e.ApplicationMessage.Topic);
+                        _logger.LogInformation(e.ApplicationMessage.Topic);
                         // e.ApplicationMessage.PayloadSegment
                         string result = e.ApplicationMessage.ConvertPayloadToString();
-                        Console.WriteLine(result);
-                        return Task.CompletedTask;
+                        _logger.LogInformation(result);
+                        decimal state = decimal.Parse(result);
+                        await Features.SensorReading.Create.Data.AddSensorReading(dbContext, e.ApplicationMessage.Topic, state);
                     };
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Console.WriteLine("Error massive problem");
-                // Handle the exception properly (logging etc.).
+                _logger.LogError("Error massive problem", ex);
             }
             finally
             {

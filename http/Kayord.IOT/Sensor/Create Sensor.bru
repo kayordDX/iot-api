@@ -1,0 +1,22 @@
+meta {
+  name: Create Sensor
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:5117/sensor
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "Topic": "esphome-web-09f530/sensor/internal_temperature/state",
+    "Name": "Internal Temperature"
+  }
+}
