@@ -1,10 +1,17 @@
+using Humanizer;
 using Riok.Mapperly.Abstractions;
 
 namespace Kayord.IOT.Features.Sensor;
 
 [Mapper]
-public static partial class SensorMapper
+public partial class SensorMapper
 {
-    public static partial IQueryable<SensorDto> ProjectToDto(this IQueryable<Entities.Sensor> q);
-    private static int TimeSpanToHours(TimeSpan t) => t.Hours;
+    public SensorDto MapSensorToSensorDto(Entities.Sensor sensor)
+    {
+        var dto = SensorToSensorDto(sensor);
+        dto.LastUpdatedString = dto.LastUpdated.Humanize();
+        return dto;
+    }
+
+    private partial SensorDto SensorToSensorDto(Entities.Sensor sensor);
 }
