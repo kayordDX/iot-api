@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/src/Kayord.IOT/bin/Debug/net7.0/Kayord.IOT.dll",
+            "program": "${workspaceFolder}/src/Kayord.IOT/bin/Debug/net8.0/Kayord.IOT.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
